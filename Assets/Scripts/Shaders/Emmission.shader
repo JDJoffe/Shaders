@@ -1,13 +1,13 @@
 ﻿// this section allows for easy sorting of out shader in the shader menu
-Shader "Lesson/Normal Albedo"
+Shader "Lesson/Emmission"
 {
-		// public properties seen on a material
+	// public properties seen on a material
 	Properties
 	{
 	// var name is _Texture , display name is Texture
 	// it is of type 2D and the default untextured colour is Black
 	_Texture("Texture",2D) = "Black"{}
-	
+	_Emmission("Emission",2D) = "Emission"{}
 	// uses rgb colour value to create xyz depth to the material
 	// bump tells unity this material needs to be marked as a normal map so it can be used correctly
 	_NormalMap("Normal",2D) = "Bump"{}
@@ -33,6 +33,7 @@ Shader "Lesson/Normal Albedo"
 		sampler2D _Texture;
 		// connects _NormapMap from properties to the _NormalMap var in CG
 		sampler2D _NormalMap;
+		sampler2D _Emmission;
 		struct Input
 		{
 		// this is in reference to our UV map of our model
@@ -41,6 +42,7 @@ Shader "Lesson/Normal Albedo"
 			float2 uv_Texture;
 			// UV map link to the _NormalMap image
 			float2 uv_NormalMap;
+			float2 uv_Emission;
 		};
 		void MainColour(Input IN, inout SurfaceOutput o)
 		{
@@ -54,6 +56,7 @@ Shader "Lesson/Normal Albedo"
 		// the light is bounced off at angles according to the image RGB or XYZ Value
 		// this makes the image look like it has depth
 		o.Normal = UnpackNormal(tex2D(_NormalMap, IN.uv_NormalMap));
+		o.Emission = tex2D(_Emmission, IN.uv_Emission);
 		}
 		// this is the end of our C for Graphics Language
 		ENDCG
