@@ -54,7 +54,7 @@ public class AnalogueGlitch : MonoBehaviour
             _material.hideFlags = HideFlags.DontSave;
         }
 
-        _verticalJumpTime += Time.deltaTime * _verticalJumpTime * 11.3f;
+        _verticalJumpTime += Time.deltaTime * _verticalJump * 11.3f;
 
         float sl_thresh = Mathf.Clamp01(1 - _scanLineJitter * 1.2f);
         float sl_disp = 0.002f + Mathf.Pow(_scanLineJitter, 3) * 0.05f;
