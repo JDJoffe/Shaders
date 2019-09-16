@@ -15,7 +15,7 @@
 		   CGPROGRAM
 		   #pragma vertex vert
 		   #pragma fragment frag
-		   #pragma fragmentation ARB_precision_hint_fastest
+		   #pragma fragmentoption ARB_precision_hint_fastest
 		   #pragma target 3.0
 		   #pragma glsl
 		   #include "UnityCG.cginc"
@@ -23,7 +23,7 @@
 		   uniform sampler2D _MainTex;
 		   uniform sampler2D _MainTex2;
 		   uniform float4 _PColor;
-		   uniform float4 _Pcolor2;
+		   uniform float4 _PColor2;
 
 		   uniform float _TimeX;
 		   uniform float _Value1;
@@ -51,19 +51,19 @@
 				float2 texcoord : TEXCOORD0;
 			};
 
-			vsf vert(appdata_t IN)
+			v2f vert(appdata_t IN)
 			{
-				vsf OUT;
+				v2f OUT;
 				OUT.vertex = UnityObjectToClipPos(IN.vertex);
 				OUT.texcoord = IN.texcoord;
-				OUT color = IN.color;
+				OUT.color = IN.color;
 
 				return OUT;
 			}
 
-			half4 _ MainTex_ST;
+			half4 _MainTex_ST;
 
-			flat4 frag(v2f i) : COLOR
+			float4 frag(v2f i) : COLOR
 			{
 				float2 uvst = UnityStereoScreenSpaceUVAdjust(i.texcoord, _MainTex_ST);
 				float2 uv = uvst;
@@ -77,22 +77,46 @@
 				#endif
 
 				float4 f = tex2D(_MainTex, uvst);
-				float4 tex1[4];
-				float4 tex2[4];
-
+				
 				float3 paper = tex2D(_MainTex2, uv).rgb;
 
 				float ce = 1;
-				float ce = _Value1
+				float4 tex1[4];
+				float4 tex2[4];
+				 float tex = _Value1;
 				float t = _TimeX * _Value4;
 				float s = floor(sin(t * 10)*0.02/12);
 				float c = floor(cos(t * 10)*0.02/12);
 				float dist = float2(c + paper.b*0.02,s + paper.b*0.02);
 
-				tex2[0] = tex2D(_MainTex, uvst + float2(tex,0)+dist/128)
-				tex2[1] = tex2D(_MainTex, uvst + float2(-tex,0)+dist/128)
-				tex2[2] = tex2D(_MainTex, uvst + float2(0,tex)+dist/128)
-				tex2[3] = tex2D(_MainTex, uvst + float2(0,-tex)+dist/128)
+				tex2[0] = tex2D(_MainTex, uvst + float2(tex,0)+dist/128);
+				tex2[1] = tex2D(_MainTex, uvst + float2(-tex,0)+dist/128);
+				tex2[2] = tex2D(_MainTex, uvst + float2(0,tex)+dist/128);
+				tex2[3] = tex2D(_MainTex, uvst + float2(0,-tex)+dist/128);
+
+				for(int i = 0; i < 4; i++)
+				{
+					tex1[i] = saturate(1 - distance(tex2[i].r,f.r));
+					tex1[i] *= saturate(1 - distance(tex2[i].g,f.g));
+					tex1[i] *= saturate(1 - distance(tex2[i].b,f.b));
+					tex1[i] = pow(tex1[i],_Value2 * 25);
+					ce *= dot(tex1[i],1);
+				}
+				ce = saturate(ce);
+				float l =1 - ce;			
+				float3 ax = l;
+				ax *= paper.b; 
+				ax = lerp(float3(0,0,0), ax * _Value3 *1.5,1);
+				float gg = lerp(1 - paper.g, 0,1 - _Value5);
+				ax = lerp(ax,float3(0,0,0),gg);
+				paper.rgb = float3(paper.r,paper.r,paper.r);
+				paper.rgb *= float3(0.695,0.496,0.3125)*1.2;
+				paper = lerp(paper.rgb,_PColor2.rgb,_Value6);
+				paper = lerp(paper, _PColor.rgb,ax * _Value3);
+				float pg = gg * 0.2;
+				paper-= pg * 0.5;
+				paper = lerp(f,paper,_Value7);
+				return float4(paper,1.0);
 			}
 		   ENDCG
 	   }
