@@ -826,10 +826,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 317221296dbbf654f9ca9004173b1918, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scanLineJitter: 0
-  _verticalJump: 0
-  _horizontalShake: 0
-  _colorDrift: 0
+  _scanLineJitter: 0.266
+  _verticalJump: 0.07
+  _horizontalShake: 0.257
+  _colorDrift: 0.274
   _shader: {fileID: 4800000, guid: 65c38058764fffb45836a7cc06e5413d, type: 3}
 --- !u!114 &534669907
 MonoBehaviour:
